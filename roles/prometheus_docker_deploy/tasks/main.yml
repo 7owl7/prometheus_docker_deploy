@@ -1,0 +1,4 @@
+- name: Create prometheus container
+  include_tasks: prom_container_deploy.yml
+  with_items: "{{ prometheus_containers }}"
+

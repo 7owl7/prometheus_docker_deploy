@@ -1,0 +1,16 @@
+---
+- name: Create the {{ item.container_name }} container data folder on the host
+  file:
+    path: /data/db-{{ item.container_name }}
+    state: directory    
+    mode: '0777'  
+
+- name: Create the {{ item.container_name }} prometheus container
+  community.docker.docker_container:
+    name: "{{ item.container_name }}"
+    image: prom/prometheus:{{ item.version }}
+    ports: 
+      - "{{ item.exposed_port }}:9090"
+    volumes:      
+      - /data/db-{{ item.container_name }}:/prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.console.libraries=/usr/share/prometheus/console_libraries", "--web.console.templates=/usr/share/prometheus/consoles",  "--storage.tsdb.retention.time={{ item.retention_time}}"]

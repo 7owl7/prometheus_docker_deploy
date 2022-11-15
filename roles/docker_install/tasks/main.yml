@@ -1,0 +1,54 @@
+---
+
+- name: Delete old docker packages if they exist
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - docker
+    - docker-engine
+    - docker.iocurl
+
+- name: Install required packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+    - python3-pip
+    update_cache: yes
+
+- name: Install docker python package
+  ansible.builtin.pip:
+    name: docker
+
+- name: Add docker apt signing key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+    state: present
+
+- name: Update repositories cache and install docker packages
+  apt:    
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+    update_cache: yes
+
+- name: Enable and start docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes

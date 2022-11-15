@@ -1,0 +1,7 @@
+---
+- name: Deploy prometheus docker instances
+  hosts:
+    - host1
+  roles:
+    - role:  docker_install
+    - role:  prometheus_docker_deploy
